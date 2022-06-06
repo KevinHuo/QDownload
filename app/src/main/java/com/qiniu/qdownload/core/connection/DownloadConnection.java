@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface DownloadConnection {
+
+
     class Response {
         private int code;
         private String message;
@@ -33,6 +35,7 @@ public interface DownloadConnection {
         }
 
         public long getContentLength() {
+
             return contentLength;
         }
 
