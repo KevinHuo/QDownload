@@ -12,17 +12,20 @@ public class OKHttpDownloadConnection {
     OkHttpClient client = new OkHttpClient();
     private String url;
     DownloadConnection.Response response;
+    private Request.Builder builder;
 
     public OKHttpDownloadConnection(String url) {
         this.url = url;
+        this.builder = new Request.Builder().url(url);
+    }
+
+    public void addHeader(String key, String value) {
+        builder.addHeader(key, value);
     }
 
     public DownloadConnection.Response execute() {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
         try {
-            Response okResponse = client.newCall(request).execute();
+            Response okResponse = client.newCall(builder.build()).execute();
             response = new DownloadConnection.Response(okResponse.code(),
                     okResponse.message(),
                     okResponse.body().contentLength(),
@@ -32,6 +35,16 @@ public class OKHttpDownloadConnection {
             e.printStackTrace();
         }
         return response;
+    }
+
+    public void close() {
+        if (response != null) {
+            try {
+                response.getInputStream().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static class Builder {
