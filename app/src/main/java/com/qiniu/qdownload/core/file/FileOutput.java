@@ -1,5 +1,11 @@
 package com.qiniu.qdownload.core.file;
 
+import android.content.Context;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+
+import com.qiniu.qdownload.core.util.Logger;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,26 +20,28 @@ public class FileOutput {
 
     private FileOutputStream fos;
     private BufferedOutputStream bos;
-    private File file;
     private InputStream inputStream;
     private FileChannel fileChannel;
+    private ParcelFileDescriptor pdf;
 
-    public FileOutput(File file, InputStream inputStream) {
-        System.out.println("hk ----- file : " + file.getAbsolutePath());
+    public FileOutput(Context context, File file, InputStream inputStream) {
+        Logger.DEFAULT.i(TAG,"create FileOutput : " + file.getAbsolutePath());
 
-        this.file = file;
-        this.inputStream = inputStream;
+        Uri uri = Uri.fromFile(file);
         try {
-            this.fos = new FileOutputStream(file);
-            this.bos = new BufferedOutputStream(fos);
-            this.fileChannel = fos.getChannel();
+            pdf = context.getContentResolver().openFileDescriptor(uri, "rw");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        this.inputStream = inputStream;
+        this.fos = new FileOutputStream(pdf.getFileDescriptor());
+        this.bos = new BufferedOutputStream(fos, BUFFER_SIZE);
+        this.fileChannel = fos.getChannel();
     }
 
     public void seek(long position) {
-        System.out.println("hk ----- seek : " + position);
+        Logger.DEFAULT.i(TAG,"seek : " + position);
 
         try {
             fileChannel.position(position);
@@ -43,7 +51,7 @@ public class FileOutput {
     }
 
     public void write() {
-        int len = 0;
+        int len;
         byte[] bytes = new byte[BUFFER_SIZE];
         long total = 0;
         try {
@@ -51,30 +59,12 @@ public class FileOutput {
                 bos.write(bytes, 0, len);
                 total += len;
             }
-            System.out.println("hk -------- total : " + total);
             bos.flush();
+            Logger.DEFAULT.i(TAG,"write length : " + total);
             bos.close();
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-//    public void write() {
-//        int len = 0;
-//        byte[] bytes = new byte[BUFFER_SIZE];
-//        long total = 0;
-//        try {
-//            while ((len = inputStream.read(bytes)) != -1) {
-//                bos.write(bytes, 0, len);
-//                total += len;
-//            }
-//            System.out.println("hk -------- total : " + total);
-//            bos.flush();
-//            bos.close();
-//            inputStream.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

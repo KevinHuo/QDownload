@@ -7,6 +7,7 @@ public class Block {
     private static final int BLOCK_SIZE = 256  * 1024;
 
     private String url;
+    private String path;
     private Range range;
     private boolean isDone;
 
@@ -47,7 +48,6 @@ public class Block {
     }
 
     public String getRangeString() {
-        System.out.println("hk ------------ range : " + "bytes=" + getLeft() + "-" + getRight());
         return "bytes=" + getLeft() + "-" + getRight();
     }
 }
