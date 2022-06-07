@@ -17,12 +17,6 @@ public class BlockTest {
         DownloadConnection.Response response = connection.execute();
         InputStream is = response.getInputStream();
         long contentLength = response.getContentLength();
-        System.out.println("hk --------- contentLength " + contentLength);
         List<Block> blocks = Block.getBlocks(url,contentLength);
-        System.out.println("hk --------- blocks " + blocks.size());
-
-
-//        FileOutput fo = new FileOutput(new File("test1.html"), is);
-//        fo.write();
     }
 }
