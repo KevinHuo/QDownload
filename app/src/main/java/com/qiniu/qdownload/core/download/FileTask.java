@@ -1,10 +1,13 @@
 package com.qiniu.qdownload.core.download;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 
 import com.qiniu.qdownload.core.connection.DownloadConnection;
 import com.qiniu.qdownload.core.connection.OKHttpDownloadConnection;
 import com.qiniu.qdownload.core.database.DatabaseHelper;
+import com.qiniu.qdownload.core.database.TaskEntry;
 import com.qiniu.qdownload.core.module.FileTaskInfo;
 import com.qiniu.qdownload.core.util.Logger;
 
@@ -51,6 +54,12 @@ public class FileTask implements Runnable, BlockDownloadListener {
         info.initNab(blocks.size());
 
         databaseHelper.insert(info.getContentValues());
+        Cursor cursor = databaseHelper.query(info.getKey());
+        cursor.close();
+
+        ContentValues values = new ContentValues();
+        values.put(TaskEntry.COLUMN_NAME_UDT,22);
+        databaseHelper.update(info.getKey(),values);
 
         Logger.DEFAULT.i(TAG, "contentLength : " + contentLength + ", blocks : " + blocks.size());
 

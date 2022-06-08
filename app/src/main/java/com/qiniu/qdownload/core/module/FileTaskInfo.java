@@ -1,6 +1,8 @@
 package com.qiniu.qdownload.core.module;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import com.qiniu.qdownload.core.database.TaskEntry;
 import com.qiniu.qdownload.core.util.Logger;
@@ -21,7 +23,7 @@ public class FileTaskInfo {
     private String url;
     private String eTag;
     private int updateTime;
-    private int progress;
+    private long progress;
     private int bits = 18;
     private char[] nab;
     private boolean wifi;
@@ -82,11 +84,11 @@ public class FileTaskInfo {
         this.updateTime = updateTime;
     }
 
-    public int getProgress() {
+    public long getProgress() {
         return progress;
     }
 
-    public void setProgress(int progress) {
+    public void setProgress(long progress) {
         this.progress = progress;
     }
 
@@ -101,6 +103,10 @@ public class FileTaskInfo {
     public void initNab(int blockNum) {
         nab = new char[blockNum];
         Arrays.fill(nab, TASK_UNDONE);
+    }
+
+    public void setNab(String nab) {
+        this.nab = nab.toCharArray();
     }
 
     public boolean isWifi() {
@@ -130,7 +136,7 @@ public class FileTaskInfo {
         }
         nab[index] = status;
 
-        Logger.DEFAULT.i(TAG,"updateNab : " + new String(nab));
+        Logger.DEFAULT.i(TAG, "updateNab : " + new String(nab));
     }
 
     public int getNextNabIndex() {
@@ -140,6 +146,30 @@ public class FileTaskInfo {
             }
         }
         return -1;
+    }
+
+    @SuppressLint("Range")
+    public static FileTaskInfo createFromDatabase(Cursor cursor) {
+            FileTaskInfo info = new FileTaskInfo();
+            if (cursor.moveToFirst()) {
+                info.setKey(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_HASH)));
+                info.setFileSize(cursor.getLong(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_FSIZE)));
+                info.setPriority(cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_PRIORITY)));
+                info.setJobs(cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_JOBS)));
+                info.setUrl(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_URL)));
+                info.seteTag(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_ETAG)));
+                info.setUpdateTime(cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_UDT)));
+                info.setProgress(cursor.getLong(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_PROGRESS)));
+                info.setBits(cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_BITS)));
+                boolean wifi = cursor.getInt(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_BITS)) > 0;
+                info.setWifi(wifi);
+                info.setNab(cursor.getString(cursor.getColumnIndex(TaskEntry.COLUMN_NAME_NAB)));
+
+                Logger.DEFAULT.i(TAG,"Info : " + info.toString());
+                return info;
+            }
+
+        return null;
     }
 
     public ContentValues getContentValues() {
@@ -156,5 +186,23 @@ public class FileTaskInfo {
         values.put(TaskEntry.COLUMN_NAME_BITS, this.bits);
         values.put(TaskEntry.COLUMN_NAME_NAB, getNabStr());
         return values;
+    }
+
+
+    @Override
+    public String toString() {
+        return "FileTaskInfo{" +
+                "key='" + key + '\'' +
+                ", fileSize=" + fileSize +
+                ", priority=" + priority +
+                ", jobs=" + jobs +
+                ", url='" + url + '\'' +
+                ", eTag='" + eTag + '\'' +
+                ", updateTime=" + updateTime +
+                ", progress=" + progress +
+                ", bits=" + bits +
+                ", nab=" + Arrays.toString(nab) +
+                ", wifi=" + wifi +
+                '}';
     }
 }
