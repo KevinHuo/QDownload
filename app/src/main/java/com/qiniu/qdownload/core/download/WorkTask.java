@@ -16,13 +16,15 @@ public class WorkTask implements Runnable {
     private int priority;
     private Block block;
     private Context context;
+    private BlockDownloadListener listener;
 
-    public WorkTask(Context context, int priority, Block block) {
+    public WorkTask(Context context, int priority, Block block, BlockDownloadListener listener) {
         Logger.DEFAULT.i(TAG, "create WorkTask , block : " + block.getRangeString());
 
         this.priority = priority;
         this.block = block;
         this.context = context;
+        this.listener = listener;
     }
 
     @Override
@@ -33,11 +35,18 @@ public class WorkTask implements Runnable {
         DownloadConnection.Response response = connection.execute();
 
         if (response.getCode() == 206) {
-            File file = new File(context.getFilesDir(), "c.csv");
+            File file = new File(block.getPath());
             FileOutput fileOutput = new FileOutput(context, file, response.getInputStream());
             fileOutput.seek(block.getLeft());
             fileOutput.write();
+            fileOutput.close();
             connection.close();
+
+            block.done();
+
+            if (listener != null) {
+                listener.onCompleted(block);
+            }
         } else {
             Logger.DEFAULT.e(TAG, "Not 206 , response code : " + response.getCode());
         }

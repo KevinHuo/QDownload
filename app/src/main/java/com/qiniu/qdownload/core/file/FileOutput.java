@@ -25,7 +25,7 @@ public class FileOutput {
     private ParcelFileDescriptor pdf;
 
     public FileOutput(Context context, File file, InputStream inputStream) {
-        Logger.DEFAULT.i(TAG,"create FileOutput : " + file.getAbsolutePath());
+        Logger.DEFAULT.i(TAG, "create FileOutput : " + file.getAbsolutePath());
 
         Uri uri = Uri.fromFile(file);
         try {
@@ -41,7 +41,7 @@ public class FileOutput {
     }
 
     public void seek(long position) {
-        Logger.DEFAULT.i(TAG,"seek : " + position);
+        Logger.DEFAULT.i(TAG, "seek : " + position);
 
         try {
             fileChannel.position(position);
@@ -60,9 +60,18 @@ public class FileOutput {
                 total += len;
             }
             bos.flush();
-            Logger.DEFAULT.i(TAG,"write length : " + total);
+            Logger.DEFAULT.i(TAG, "write length : " + total);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void close() {
+        try {
             bos.close();
-            inputStream.close();
+            fos.close();
+            pdf.close();
+            fileChannel.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
