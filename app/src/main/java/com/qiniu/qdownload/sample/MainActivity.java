@@ -12,6 +12,10 @@ public class MainActivity extends AppCompatActivity {
     static final String URL2 = "http://p5mlo8b4j.bkt.clouddn.com/1-ZoeLiu-AOM%20-%20Open%20Source%20Video%20Codec.pdf";
     static final String URL3 = "http://rd22mq0yl.hn-bkt.clouddn.com/test.csv";
 
+    static final String FILE_NAME1 = "file1.apk";
+    static final String FILE_NAME2 = "file2.pdf";
+    static final String FILE_NAME3 = "file3.csv";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FileTask fileTask = new FileTask(MainActivity.this, URL3);
+                String cacheDir = MainActivity.this.getFilesDir().getAbsolutePath();
+                String filePath = cacheDir + "/" + FILE_NAME1;
+                FileTask fileTask = new FileTask(MainActivity.this, URL1, filePath);
                 fileTask.init();
             }
         }).start();

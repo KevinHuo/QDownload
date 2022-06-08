@@ -12,11 +12,11 @@ import java.util.List;
 public class BlockTest {
     @Test
     public void getBlocksTest() {
-        String url = "https://cdn.llscdn.com/yy/files/xs8qmxn8-lls-LLS-5.8-800-20171207-111607.apk";
-        OKHttpDownloadConnection connection = new OKHttpDownloadConnection.Builder(url).build();
-        DownloadConnection.Response response = connection.execute();
-        InputStream is = response.getInputStream();
-        long contentLength = response.getContentLength();
-        List<Block> blocks = Block.getBlocks(url,contentLength);
+//        String url = "https://cdn.llscdn.com/yy/files/xs8qmxn8-lls-LLS-5.8-800-20171207-111607.apk";
+//        OKHttpDownloadConnection connection = new OKHttpDownloadConnection.Builder(url).build();
+//        DownloadConnection.Response response = connection.execute();
+//        InputStream is = response.getInputStream();
+//        long contentLength = response.getContentLength();
+//        List<Block> blocks = Block.getBlocks(url,contentLength);
     }
 }
